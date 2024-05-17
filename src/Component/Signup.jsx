@@ -10,6 +10,13 @@ const Signup = () => {
     const email=useRef(null);
     const password=useRef(null);
     const confirmPassword=useRef(null);
+
+    const matchPassword=()=>{
+      if(password.current.value===confirmPassword.current.value){
+        setErrMsg("Password Matched !")
+      }
+    }
+    
     const toggle=()=>{
       setSignIn(!signIn)
     }
@@ -52,6 +59,7 @@ const Signup = () => {
             if (response.ok) {
               const data=await response.json();
               console.log(data.idToken);
+              localStorage.setItem("idToken",data.idToken);
               navigate("/Home")
             } else {
               const data=await response.json();
@@ -100,7 +108,7 @@ const Signup = () => {
     <form className='flex justify-center flex-col w-[70%] mx-auto space-y-4' onSubmit={(e)=>{handleSubmit(e);}}>
         <input className='border border-green-600 p-2 rounded-md'  type='email' placeholder='Email' ref={email}/>
         <input  className='border border-green-600 p-2 rounded-md' type='password' placeholder='Password' ref={password}/>
-       {!signIn && <input  className='border border-green-600 p-2 rounded-md' type='password' placeholder='Confirm Password' ref={confirmPassword}/>}
+       {!signIn && <input  className='border border-green-600 p-2 rounded-md' type='password' placeholder='Confirm Password' onChange={matchPassword} ref={confirmPassword}/>}
         <button className='border bg-green-600 p-2 rounded-md'>{!signIn?"Sign Up":"Login"} Up</button>
     </form>
 
