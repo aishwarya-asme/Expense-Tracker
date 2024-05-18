@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate } from 'react-router-dom';
 
 const Signup = () => {
-    const [signIn,setSignIn]=useState(false);
+    const [signIn,setSignIn]=useState(true);
     const [errMsg,setErrMsg]=useState(null);
     const navigate=useNavigate();
+    const [forgotPassword,setForgotPassword]=useState(false)
 
     const email=useRef(null);
     const password=useRef(null);
@@ -13,13 +14,48 @@ const Signup = () => {
 
     const matchPassword=()=>{
       if(password.current.value===confirmPassword.current.value){
-        setErrMsg("Password Matched !")
+        setErrMsg("Password Matched !");
       }
     }
-    
+
     const toggle=()=>{
       setSignIn(!signIn)
     }
+
+    const forgotPasswordToggle =()=>{
+      setForgotPassword(forgotPassword)
+    }
+
+    const handleForgotPassword=async(e)=>{
+      e.preventDefault();
+  
+      const enteredEmail = email.current.value;
+  
+      try {
+        const response = await fetch(
+          "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyD4xAeGjkhVqInw_vpGG1ey_Z3A0vZvFXc",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              email: enteredEmail,
+              requestType: "PASSWORD_RESET",
+            }),
+            headers: {
+              "Content-type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          //
+          alert("Password reset link has been sent to you email")
+        } else {
+          const data = await response.json();
+          console.log(data);
+        }
+      } catch (error) {
+        console.error("Error", error);
+      }
+    };
 
     useEffect(()=>{
       if(errMsg){
@@ -28,10 +64,10 @@ const Signup = () => {
         },4000);
 
         return()=>{
-          clearTimeout(timer)
-        }
+          clearTimeout(timer);
+        };
       }
-    },[errMsg])
+    },[errMsg]);
     
     const handleSubmit=async(e)=>{
       e.preventDefault();
@@ -60,7 +96,7 @@ const Signup = () => {
               const data=await response.json();
               console.log(data.idToken);
               localStorage.setItem("idToken",data.idToken);
-              navigate("/Home")
+              navigate("/home")
             } else {
               const data=await response.json();
               setErrMsg(data.error.message)
@@ -101,20 +137,56 @@ const Signup = () => {
     } 
   }
     
+
+  
   return (
-    <div className='w-1/4 h-auto mx-auto border bg-white border-gray-400 mt-40 text-center'>
-      <h1 className='text-2xl text-green-600 py-8 font-semibold text-center'>{!signIn?"Sign Up":"Login"}</h1>
+    <>
+   {!forgotPassword ? (
+     <div className='w-1/4 h-auto mx-auto border bg-white border-gray-400 mt-40 text-center'>
+      <h1 className='text-2xl text-green-600 py-8 font-semibold text-center'>
+        {!signIn ? "Sign Up":"Login"}
+        </h1>
       <p className='text-lg py-1 text-red-500'>{errMsg}</p>
+
     <form className='flex justify-center flex-col w-[70%] mx-auto space-y-4' onSubmit={(e)=>{handleSubmit(e);}}>
+
         <input className='border border-green-600 p-2 rounded-md'  type='email' placeholder='Email' ref={email}/>
         <input  className='border border-green-600 p-2 rounded-md' type='password' placeholder='Password' ref={password}/>
-       {!signIn && <input  className='border border-green-600 p-2 rounded-md' type='password' placeholder='Confirm Password' onChange={matchPassword} ref={confirmPassword}/>}
-        <button className='border bg-green-600 p-2 rounded-md'>{!signIn?"Sign Up":"Login"} Up</button>
+       {!signIn && ( <input  className='border border-green-600 p-2 rounded-md' type='password' placeholder='Confirm Password' onChange={matchPassword} ref={confirmPassword}/>)}
+        <button className='bg-green-600 rounded-3xl text-white p-2 shadow-md font-semibold my-10'>{!signIn ? "Sign Up":"Login"} Up</button>
     </form>
 
-    <button className='font-semibold my-10' onClick={toggle}>{!signIn ? "Have an account ? Login":"New User ? Sign Up"} </button>
+    <button className='my-6 font-semibold' onClick={toggle}>{!signIn ? "Have an account ? Login":"New User ? Sign Up"} </button>
+
+    <div className="pb-10 font-semibold text-red-500"> 
+    <Link onClick={forgotPasswordToggle}>Forgot Password</Link>
     </div>
-  )
-}
+    </div>
+  ) : (
+    <div className="w-1/4 h-auto mx-auto border bg-white border-gray-300 mt-40 text-center">
+    <form className="flex justify-center pt-10 flex-col w-[70%] mx-auto space-y-4"
+    onSubmit={(e)=>{
+      handleForgotPassword(e);
+    }}>
+    <input
+              className="border border-gray-400 p-2 rounded-md"
+              placeholder="Email"
+              type="email"
+              ref={email}
+            />
+
+            <button className="bg-blue-500 rounded-3xl font-semibold text-white p-2 shadow-md">
+            Set Password </button>      
+    </form>
+
+    <div className="py-5 font-semibold text-red-500">
+    <Link onClick={forgotPasswordToggle}>
+      Already set password? Login now</Link>
+    </div>
+    </div>
+  )}
+    </>
+  );
+};
 
 export default Signup

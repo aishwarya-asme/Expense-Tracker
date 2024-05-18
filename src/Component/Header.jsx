@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Profile from './Profile';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [profile,setProfile]=useState(false);
@@ -7,9 +8,10 @@ const Header = () => {
   const [displayName,setdisplayName]=useState(null);
   const [photoURL,setphotoURL]=useState(null);
   const [profileComplete,setProfileComplete]=useState(false);
+  const navigate=useNavigate();
+  const isLoggedIn=!!tokenID;
 
-
-
+  
   const handleProfile=()=>{
     setProfile(!profile)
   };
@@ -18,7 +20,7 @@ const Header = () => {
     const fetchData = async () => {
     try {
       const response=await fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyD66jURNjlpKIlniFkfom3AFtWFiTeWF0w",
+        "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyD4xAeGjkhVqInw_vpGG1ey_Z3A0vZvFXc",
           {
             method: "POST",
             body: JSON.stringify({ idToken: tokenID }),
@@ -30,6 +32,9 @@ const Header = () => {
       if (response.ok) {
         const data = await response.json();
         const data1 = data.users[0];
+        data1.displayName
+            ? setProfileComplete(true)
+            : setProfileComplete(false);
         setdisplayName(data1.displayName);
         setphotoURL(data1.photoUrl);
         setProfileComplete(true);
@@ -41,24 +46,54 @@ const Header = () => {
     } catch (error) {
       console.error("Error:", error);
     }
-  }
+  };
+
   fetchData();
 },[tokenID]);
 
+
+const handleLogout = () => {
+  localStorage.removeItem("idToken");
+  navigate("/");
+};
+
   return (
     <div>
-        <div className='flex bg-green-500 justify-evenly text-xl shadow-md w-full font-bold py-4'>
+        <div className='flex bg-green-500 justify-evenly text-xl shadow-md w-full font-medium'>
           <div className='flex w-1/4 justify-evenly py-10'>
             <h1>Home</h1>
             <h1>Products</h1>
             <h1>About Us</h1>
             </div>
-           {!profileComplete && (<h1 className="text-lg text-center m-4 p-4">Your profile is incomplete.{" "}
+           
+           {!profileComplete && isLoggedIn ?(
+            <h1 className="text-lg text-center m-4 p-4">
+            Your profile is incomplete.{" "}
             <button 
             onClick={handleProfile} 
-            className='text-blue-500'>Complete Now</button>
-            </h1>)}
+            className='text-blue-500'>Complete Now
+            </button>
+            </h1>
+           ):(
+            ""
+           )}
 
+              {
+                isLoggedIn &&(
+                  <div className="flex my-5">
+                    {profileComplete && (
+                      <>
+                      <img 
+                      className='w-14 h-14 mx-2 rounded-full'
+                      src={photoURL} alt="logo" />
+                      <h1 className='py-4'>{displayName}</h1>
+                      </>
+                    )}
+                    <button className="mx-4 px-4 m-2 text-lg bg-blue-500 text-white font-semibold shadow-md rounded-md"
+              onClick={handleLogout}>LogOut</button>
+                  </div>
+                )
+              }
             <div>
               <img className='w-14 h-14 mx-2 rounded-full' src={photoURL} alt="logo" />
               <h1 className='py-4'>{displayName}</h1>
@@ -66,7 +101,7 @@ const Header = () => {
         </div>
        { profile && <Profile handleProfile={handleProfile}/>}
     </div>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
