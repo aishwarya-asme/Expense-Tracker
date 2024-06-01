@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import Profile from './Profile';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../Store/authSlice";
 
 const Header = () => {
   const [profile,setProfile]=useState(false);
-  const tokenID=localStorage.getItem("idToken");
+  // const tokenID=localStorage.getItem("idToken");
+  const token_ID = useSelector((store) => store.auth.tokenID);
   const [displayName,setdisplayName]=useState(null);
   const [photoURL,setphotoURL]=useState(null);
   const [profileComplete,setProfileComplete]=useState(false);
   const navigate=useNavigate();
-  const isLoggedIn=!!tokenID;
+  // const isLoggedIn=!!tokenID;
+  const dispatch = useDispatch();
+  const isLogin = useSelector((store) => store.auth.isAuthenticated);
 
   
   const handleProfile=()=>{
@@ -23,7 +28,7 @@ const Header = () => {
         "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyD4xAeGjkhVqInw_vpGG1ey_Z3A0vZvFXc",
           {
             method: "POST",
-            body: JSON.stringify({ idToken: tokenID }),
+            body: JSON.stringify({ idToken: token_ID }),
             headers: {
               "Content-type": "application/json",
             },
@@ -49,11 +54,12 @@ const Header = () => {
   };
 
   fetchData();
-},[tokenID]);
+},[token_ID]);
 
 
 const handleLogout = () => {
   localStorage.removeItem("idToken");
+  dispatch(logout());
   navigate("/");
 };
 
@@ -66,7 +72,7 @@ const handleLogout = () => {
             <h1>About Us</h1>
             </div>
            
-           {!profileComplete && isLoggedIn ?(
+           {!profileComplete && isLogin ?(
             <h1 className="text-lg text-center m-4 p-4">
             Your profile is incomplete.{" "}
             <button 
@@ -79,7 +85,7 @@ const handleLogout = () => {
            )}
 
               {
-                isLoggedIn &&(
+                isLogin &&(
                   <div className="flex my-5">
                     {profileComplete && (
                       <>
@@ -89,7 +95,7 @@ const handleLogout = () => {
                       <h1 className='py-4'>{displayName}</h1>
                       </>
                     )}
-                    <button className="mx-4 px-4 m-2 text-lg bg-blue-500 text-white font-semibold shadow-md rounded-md"
+                    <button className="mx-4 px-4 m-2 text-lg bg-blue-500 text-white font-semibold shadow-md rounded-md  hover:bg-blue-600"
               onClick={handleLogout}>LogOut</button>
                   </div>
                 )

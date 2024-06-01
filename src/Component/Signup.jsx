@@ -1,10 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import {Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { login } from "../Store/authSlice";
 
 const Signup = () => {
     const [signIn,setSignIn]=useState(true);
     const [errMsg,setErrMsg]=useState(null);
+    const dispatch = useDispatch();
     const navigate=useNavigate();
     const [forgotPassword,setForgotPassword]=useState(false)
 
@@ -16,7 +19,7 @@ const Signup = () => {
       if(password.current.value===confirmPassword.current.value){
         setErrMsg("Password Matched !");
       }
-    }
+    };
 
     const toggle=()=>{
       setSignIn(!signIn)
@@ -94,8 +97,15 @@ const Signup = () => {
 
             if (response.ok) {
               const data=await response.json();
-              console.log(data.idToken);
-              localStorage.setItem("idToken",data.idToken);
+              // console.log(data.idToken);
+              // localStorage.setItem("idToken",data.idToken);
+              const idToken = data.idToken;
+          localStorage.setItem("idToken", idToken);
+          dispatch(login({ tokenID: idToken, userID: enteredEmail }));
+
+
+
+              localStorage.setItem("user",enteredEmail);
               navigate("/home")
             } else {
               const data=await response.json();
