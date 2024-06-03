@@ -4,7 +4,7 @@ import { addData } from "../Store/expensesSlice";
 
 
 const Input = () => {
-    const [expenses,setExpenses]=useState([]);
+    
     const [isLoading,setIsLoading]=useState(true);
     const [editingExpense,setEditingExpense]=useState(null);
     const [editAmount, setEditAmount] = useState("");
@@ -12,6 +12,8 @@ const Input = () => {
     const [editType, setEditType] = useState("");
     const dispatch = useDispatch();
     const data = useSelector((store) => store.expenses.expenses);
+    const [totalPrice,setTotalPrice]=useState(null);
+    const isDarkTheme=useSelector((store)=>store.theme.isDarkTheme);
 
     const amount=useRef(null);
     const desc=useRef(null);
@@ -43,7 +45,14 @@ const Input = () => {
     };
     useEffect(()=>{
       fetchData();
-    },[]);
+      if (data !== null) {
+        const totalAmt = data.reduce(
+          (acc, curr) => acc + parseInt(curr.price),
+          0
+        );
+        setTotalPrice(totalAmt);
+      }
+    }, [data]);
 
     const handleSubmit=async (e)=>{
         e.preventDefault();
@@ -114,8 +123,8 @@ const Input = () => {
         };
   
   return (
-    <>
-        <form className='w-[50%] flex justify-center mx-auto my-10'
+    <div>
+        <form className="w-[60%] md:w-[50%] flex flex-col md:flex-row justify-center mx-auto my-10"
         onSubmit={handleSubmit}>
 
             <input className="p-2 m-2 border border-gray-400" placeholder="Amount Spent" type="number" ref={amount} value={editAmount} onChange={(e)=>setEditAmount(e.target.value)}/>
@@ -133,15 +142,28 @@ const Input = () => {
             <button className="bg-blue-500 text-white shadow-md rounded-md m-2 p-2 font-semibold hover:bg-blue-600">{editingExpense ? "Update Expense" : "Add Expense"}</button>
         </form>
 
+        <p className={`${isDarkTheme? "text-center text-lg font-semibold text-white" : "font-semibold text-center text-lg" }`}>
+        Total Amount Spent : ₹{totalPrice}
+      </p>
+      {totalPrice > 10000 && (
+        <div>
+          <button className="flex m-4 mx-auto bg-blue-500 text-white shadow-md rounded-md p-2 font-semibold hover:bg-blue-600">
+            ✨Activate Premium✨
+          </button>
+        </div>
+      )}
+
         {isLoading ? (
             <div className="text-3xl mt-10 text-center font-semibold">
             Loading...
           </div>
         ):(
 
-        <div className="w-[50%] mx-auto flex flex-wrap m-5 p-10">
+        <div className="w-[80%] md:w-[50%] mx-auto flex flex-col md:flex-row flex-wrap m-5">
         {data.map((item) => (
-          <div className="m-5 w-[30%] h-[40%] flex flex-col mx-auto p-5 list-none border border-gray-400 text-xl font-semibold text-center" key={item.key}>
+          <div 
+          className="w-[80%] md:w-[30%] m-5 h-[40%] flex flex-col text-center mx-auto rounded-lg bg-white p-5 list-none border border-gray-400 text-xl font-semibold" 
+          key={item.key}>
             <div className="m-2 text-green-500 text-3xl p-2">{item.description}</div>
             <div className="m-2 p-2">{item.category}</div>
             <div className="m-2 p-2">{item.price}</div>
@@ -164,7 +186,7 @@ const Input = () => {
         ))}
       </div>
         )}
-    </>
+    </div>
   );
 };
 

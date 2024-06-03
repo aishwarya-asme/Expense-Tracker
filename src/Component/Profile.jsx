@@ -39,13 +39,13 @@ const Profile = (props) => {
         }
     }
   return (
-    <div className="w-[30%] mx-auto">
+    <div className="w-3/4 md:w-[30%] mx-auto">
         <form 
-        className="w-full mx-auto shadow-md p-10 m-10 space-x-5 border border-gray-400 rounded-md"
-        onSubmit={(e)=>{updateProfile(e);}}>
-            <input className="p-2 border border-gray-400 rounded-md"type="text" placeholder='Full Name' ref={name} />
-            <input className="p-2 border border-gray-400 rounded-md" type="text" placeholder='Profile Photo URL' ref={photoURL} />
-            <button className="bg-blue-500 rounded-md shadow-md text-white font-semibold p-2">Add</button>
+         className="mx-auto w-full justify-evenly flex flex-col md:flex-row shadow-md p-8 md:p-10 m-10 border border-gray-400 rounded-md"
+         onSubmit={(e)=>{updateProfile(e);}}>
+            <input className="p-2 m-2 md:m-0 border border-gray-400 rounded-md"type="text" placeholder='Full Name' ref={name} />
+            <input className="p-2 m-2 md:m-0 border border-gray-400 rounded-md" type="text" placeholder='Profile Photo URL' ref={photoURL} />
+            <button className="bg-blue-500 m-2 md:m-0 rounded-md shadow-md text-white font-semibold p-2">Add</button>
         </form>
     </div>
   )

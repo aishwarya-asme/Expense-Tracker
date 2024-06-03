@@ -26,7 +26,7 @@ const Signup = () => {
     }
 
     const forgotPasswordToggle =()=>{
-      setForgotPassword(forgotPassword)
+      setForgotPassword(!forgotPassword)
     }
 
     const handleForgotPassword=async(e)=>{
@@ -81,7 +81,7 @@ const Signup = () => {
       if (signIn) {
         try{
             const response=await fetch(
-              'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyD4xAeGjkhVqInw_vpGG1ey_Z3A0vZvFXc',
+              "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyD4xAeGjkhVqInw_vpGG1ey_Z3A0vZvFXc",
               {
                   method:"POST",
                   body: JSON.stringify({
@@ -119,7 +119,8 @@ const Signup = () => {
       
       else {
         try{
-          const response=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyD4xAeGjkhVqInw_vpGG1ey_Z3A0vZvFXc',
+          const response=await fetch(
+            'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyD4xAeGjkhVqInw_vpGG1ey_Z3A0vZvFXc',
           {
             method:"POST",
             body: JSON.stringify({
@@ -152,7 +153,7 @@ const Signup = () => {
   return (
     <>
    {!forgotPassword ? (
-     <div className='w-1/4 h-auto mx-auto border bg-white border-gray-400 mt-40 text-center'>
+     <div className='w-3/4 md:w-1/4 h-auto mx-auto border bg-white border-gray-400 mt-10 md:mt-40 text-center'>
       <h1 className='text-2xl text-green-600 py-8 font-semibold text-center'>
         {!signIn ? "Sign Up":"Login"}
         </h1>
@@ -163,7 +164,7 @@ const Signup = () => {
         <input className='border border-green-600 p-2 rounded-md'  type='email' placeholder='Email' ref={email}/>
         <input  className='border border-green-600 p-2 rounded-md' type='password' placeholder='Password' ref={password}/>
        {!signIn && ( <input  className='border border-green-600 p-2 rounded-md' type='password' placeholder='Confirm Password' onChange={matchPassword} ref={confirmPassword}/>)}
-        <button className='bg-green-600 rounded-3xl text-white p-2 shadow-md font-semibold my-10'>{!signIn ? "Sign Up":"Login"} Up</button>
+        <button className='bg-green-600 rounded-3xl text-white p-2 shadow-md font-semibold my-10'>{!signIn ? "Sign Up":"Login"} </button>
     </form>
 
     <button className='my-6 font-semibold' onClick={toggle}>{!signIn ? "Have an account ? Login":"New User ? Sign Up"} </button>
@@ -173,7 +174,7 @@ const Signup = () => {
     </div>
     </div>
   ) : (
-    <div className="w-1/4 h-auto mx-auto border bg-white border-gray-300 mt-40 text-center">
+    <div className="w-3/4 md:w-1/4 h-auto mx-auto border bg-white border-gray-300 mt-40 text-center">
     <form className="flex justify-center pt-10 flex-col w-[70%] mx-auto space-y-4"
     onSubmit={(e)=>{
       handleForgotPassword(e);
@@ -199,4 +200,4 @@ const Signup = () => {
   );
 };
 
-export default Signup
+export default Signup;
