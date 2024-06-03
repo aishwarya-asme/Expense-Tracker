@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import { addData } from "../Store/expensesSlice";
+import Download from './Download';
+import {setTheme} from "../Store/themeSlice";
 
 
 const Input = () => {
@@ -14,6 +16,7 @@ const Input = () => {
     const data = useSelector((store) => store.expenses.expenses);
     const [totalPrice,setTotalPrice]=useState(null);
     const isDarkTheme=useSelector((store)=>store.theme.isDarkTheme);
+    const userID=useSelector((store)=>store.auth.userID);
 
     const amount=useRef(null);
     const desc=useRef(null);
@@ -21,8 +24,14 @@ const Input = () => {
 
     const fetchData=async()=>{
       try{
+        const dummyEmail = userID
+        .toLowerCase()
+        .split("")
+        .filter((x) => x.charCodeAt(0) >= 97 && x.charCodeAt(0) <= 122)
+        .join("");
+
         const response=await fetch(
-          "https://expenses-975b0-default-rtdb.firebaseio.com/expenses.json"
+          `https://expenses-975b0-default-rtdb.firebaseio.com/${dummyEmail}/expenses.json`
         );
         const data=await response.json();
         const loadedExpenses=[];
@@ -64,12 +73,18 @@ const Input = () => {
 
         };
 
+        const dummyEmail = userID
+        .toLowerCase()
+        .split("")
+        .filter((x) => x.charCodeAt(0) >= 97 && x.charCodeAt(0) <= 122)
+        .join("");
+
         try{
-          let url="https://expenses-975b0-default-rtdb.firebaseio.com/expenses.json";
+          let url=`https://expenses-975b0-default-rtdb.firebaseio.com/${dummyEmail}/expenses.json`;
           let method="POST";
 
           if(editingExpense){
-            url=`https://expenses-975b0-default-rtdb.firebaseio.com/expenses/${editingExpense.key}.json`;
+            url=`https://expenses-975b0-default-rtdb.firebaseio.com/${dummyEmail}/expenses/${editingExpense.key}.json`;
             method="PATCH";
           }
 
@@ -101,8 +116,14 @@ const Input = () => {
 
         const deleteItem = async (key) => {
           try {
+            const dummyEmail = userID
+        .toLowerCase()
+        .split("")
+        .filter((x) => x.charCodeAt(0) >= 97 && x.charCodeAt(0) <= 122)
+        .join("");
+
             await fetch(
-              `https://expenses-975b0-default-rtdb.firebaseio.com/expenses/${key}.json`,
+              `https://expenses-975b0-default-rtdb.firebaseio.com/${dummyEmail}/expenses/${key}.json`,
               {
                 method: "DELETE",
               }
@@ -122,13 +143,24 @@ const Input = () => {
           setEditType(expense.category);
         };
   
+
+        const handleToggleTheme = () => {
+          dispatch(setTheme());
+        };
+
   return (
     <div>
-        <form className="w-[60%] md:w-[50%] flex flex-col md:flex-row justify-center mx-auto my-10"
+        <form 
+        className="w-[60%] md:w-[50%] flex flex-col md:flex-row justify-center mx-auto my-10"
         onSubmit={handleSubmit}>
 
-            <input className="p-2 m-2 border border-gray-400" placeholder="Amount Spent" type="number" ref={amount} value={editAmount} onChange={(e)=>setEditAmount(e.target.value)}/>
-            <input className="p-2 m-2 border border-gray-400" placeholder="Description" type="text" ref={desc} value={editDesc} onChange={(e)=>setEditDesc(e.target.value)}/>
+            <input className="p-2 m-2 border border-gray-400" 
+            placeholder="Amount Spent" 
+            type="number" 
+            required 
+            ref={amount} 
+            value={editAmount} onChange={(e)=>setEditAmount(e.target.value)}/>
+            <input className="p-2 m-2 border border-gray-400" placeholder="Description" type="text" required ref={desc} value={editDesc} onChange={(e)=>setEditDesc(e.target.value)}/>
             <select ref={type} 
             className="p-2 m-2 border border-gray-400"
             value={editType}
@@ -142,19 +174,28 @@ const Input = () => {
             <button className="bg-blue-500 text-white shadow-md rounded-md m-2 p-2 font-semibold hover:bg-blue-600">{editingExpense ? "Update Expense" : "Add Expense"}</button>
         </form>
 
-        <p className={`${isDarkTheme? "text-center text-lg font-semibold text-white" : "font-semibold text-center text-lg" }`}>
+        <p className={`${
+          isDarkTheme
+          ? "text-center text-lg font-semibold text-white" 
+          : "font-semibold text-center text-lg" }`}>
         Total Amount Spent : ₹{totalPrice}
       </p>
       {totalPrice > 10000 && (
         <div>
-          <button className="flex m-4 mx-auto bg-blue-500 text-white shadow-md rounded-md p-2 font-semibold hover:bg-blue-600">
+          <button className="flex m-4 mx-auto bg-blue-500 text-white shadow-md rounded-md p-2 font-semibold hover:bg-blue-600"
+          onClick={handleToggleTheme}>
             ✨Activate Premium✨
           </button>
         </div>
       )}
 
+        <Download data={data}/>
         {isLoading ? (
-            <div className="text-3xl mt-10 text-center font-semibold">
+            <div className={`${
+              isDarkTheme
+              ?"text-white text-3xl mt-10 text-center font-semibold"
+              : "text-gray-800 text-3xl mt-10 text-center font-semibold"
+            }`}>
             Loading...
           </div>
         ):(

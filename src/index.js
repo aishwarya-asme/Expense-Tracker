@@ -8,6 +8,8 @@ import Signup from './Component/Signup';
 import Home from './Component/Home';
 import {Provider} from "react-redux";
 import appStore from './Store/appStore';
+import AboutUs from './Component/About';
+import Products from './Component/Products';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -17,7 +19,9 @@ const appRouter=createBrowserRouter([
     element:<App/>,
     children:[
       {path:"/",element:<Signup/>},
-      {path:"home",element:<Home/>}
+      {path:"home",element:<Home/>},
+      {path:"/about",element:<AboutUs/>},
+      {path:"products",element:<Products/>},
     ]
   }
 ]);
